@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车牌识别系统</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .upload-section {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .result-section {
+            animation: slideIn 0.8s ease-out 0.2s;
+        }
+
+        .history-section {
+            animation: slideIn 0.8s ease-out 0.4s;
+        }
+
+        .flow-section {
+            animation: slideIn 0.8s ease-out 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
+            background: #607d8b;
+        }
+
+        .section-badge.entry {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        }
+
+        .section-badge.exit {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+
+        .upload-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .image-preview {
+            width: 100%;
+            min-height: 220px;
+            border-radius: 12px;
+            border: 2px dashed rgba(30, 60, 114, 0.2);
+            background: rgba(255, 255, 255, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #607d8b;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-image {
+            max-width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .preview-image:hover {
+            transform: scale(1.02);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-table th, .history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-table th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .history-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 12px 20px;
+            width: 300px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #2196F3;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #388E3C 0%, #2E7D32 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn[disabled] {
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            background: linear-gradient(135deg, #b0bec5 0%, #90a4ae 100%);
+            color: #ffffff;
+        }
+
+        .section-title {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 500;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 3px;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .result-value {
+            color: #2196F3;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        .result-secondary {
+            color: #607d8b;
+        }
+
+        .action-cell {
+            width: 100px;
+            text-align: center;
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.success {
+            background: rgba(33, 150, 243, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        .toast.info {
+            background: rgba(96, 125, 139, 0.9);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>智能车牌识别系统</h1>
+    </div>
+
+    <div class="container">
+        <!-- 进库图片识别模块 -->
+        <div class="section flow-section">
+            <div class="section-header">
+                <h2 class="section-title">进库图片识别</h2>
+                <span class="section-badge entry">进库</span>
+            </div>
+            <div class="upload-controls">
+                <input type="file" id="entryImageInput" accept="image/*" style="display: none;">
+                <label for="entryImageInput" class="btn btn-primary">选择进库图片</label>
+                <button id="entryUploadButton" onclick="processUpload('entry')" class="btn btn-primary">上传并识别</button>
+            </div>
+            <div id="entryImagePreview" class="image-preview">
+                尚未选择进库图片
+            </div>
+        </div>
+
+        <!-- 出库图片识别模块 -->
+        <div class="section flow-section">
+            <div class="section-header">
+                <h2 class="section-title">出库图片识别</h2>
+                <span class="section-badge exit">出库</span>
+            </div>
+            <div class="upload-controls">
+                <input type="file" id="exitImageInput" accept="image/*" style="display: none;">
+                <label for="exitImageInput" class="btn btn-primary">选择出库图片</label>
+                <button id="exitUploadButton" onclick="processUpload('exit')" class="btn btn-primary">上传并识别</button>
+            </div>
+            <div id="exitImagePreview" class="image-preview">
+                尚未选择出库图片
+            </div>
+        </div>
+
+        <!-- 识别结果面板 -->
+        <div class="section result-section">
+            <h2 class="section-title">识别结果</h2>
+            <div id="result" class="result-box">
+                <div class="result-item">
+                    <span class="result-label">车牌号码：</span>
+                    <span class="result-value">等待识别...</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">颜色：</span>
+                    <span class="result-value">等待识别...</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">识别信息：</span>
+                    <span class="result-value result-secondary">尚未识别</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">应缴费用：</span>
+                    <span class="result-value result-secondary">--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录查询 -->
+        <div class="section history-section">
+            <h2 class="section-title">历史记录查询</h2>
+            <div class="search-box">
+                <input type="text" id="plateNumber" placeholder="输入车牌号码">
+                <button onclick="searchHistory()" class="btn btn-success">查询</button>
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>车牌号码</th>
+                        <th>颜色</th>
+                        <th>进库时间</th>
+                        <th>出库时间</th>
+                        <th>应缴费用</th>
+                        <th class="action-cell">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center;">暂无历史记录</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // 默认结果占位，用于界面初始化和失败兜底。
+        const DEFAULT_RESULT = {
+            number: '等待识别...',
+            color: '等待识别...',
+        };
+
+        /**
+         * 全局轻量提示函数，统一控制 toast 展示。
+         */
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function formatCameraLabel(cameraType) {
+            const labels = {
+                entry: '进库识别',
+                exit: '出库识别',
+            };
+            return labels[cameraType] || '其他识别';
+        }
+
+        /**
+         * 费用展示为两位小数，若不存在则显示 --。
+         */
+        function formatFee(fee) {
+            const value = Number(fee);
+            if (Number.isNaN(value)) {
+                return '--';
+            }
+            return `￥${value.toFixed(2)}`;
+        }
+
+        /**
+         * 将分钟数格式化为“X小时Y分钟”。
+         */
+        function formatDuration(minutes) {
+            const total = Number(minutes) || 0;
+            const hours = Math.floor(total / 60);
+            const mins = total % 60;
+            if (hours > 0) {
+                return `${hours}小时${mins ? `${mins}分钟` : ''}`.trim();
+            }
+            return `${total}分钟`;
+        }
+
+        /**
+         * 设置识别面板处于“加载中”状态。
+         */
+        function setResultLoading() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result-item loading">
+                    <span class="result-label">车牌号码：</span>
+                    <span class="result-value">识别中...</span>
+                </div>
+                <div class="result-item loading">
+                    <span class="result-label">颜色：</span>
+                    <span class="result-value">识别中...</span>
+                </div>
+                <div class="result-item loading">
+                    <span class="result-label">识别信息：</span>
+                    <span class="result-value result-secondary">处理中...</span>
+                </div>
+                <div class="result-item loading">
+                    <span class="result-label">应缴费用：</span>
+                    <span class="result-value result-secondary">计算中...</span>
+                </div>
+            `;
+        }
+
+        /**
+         * 根据识别结果与记录信息刷新右侧面板。
+         */
+        function updateResultDisplay(result = {}, record = null) {
+            const resultDiv = document.getElementById('result');
+            const plateNumber = result.number || DEFAULT_RESULT.number;
+            const color = result.color || DEFAULT_RESULT.color;
+
+            const items = [
+                { label: '车牌号码', value: plateNumber, secondary: false },
+                { label: '颜色', value: color, secondary: false },
+            ];
+
+            if (record) {
+                items.push({
+                    label: '识别类型',
+                    value: formatCameraLabel(record.camera_type),
+                    secondary: true,
+                });
+
+                if (record.camera_type === 'entry') {
+                    items.push({
+                        label: '进库时间',
+                        value: record.entry_time || record.recognition_time,
+                        secondary: true,
+                    });
+                } else if (record.camera_type === 'exit') {
+                    items.push({
+                        label: '进库时间',
+                        value: record.entry_time || '-',
+                        secondary: true,
+                    });
+                    items.push({
+                        label: '出库时间',
+                        value: record.exit_time || record.recognition_time,
+                        secondary: true,
+                    });
+                    if (record.duration_minutes) {
+                        items.push({
+                            label: '停留时长',
+                            value: formatDuration(record.duration_minutes),
+                            secondary: true,
+                        });
+                    }
+                    items.push({
+                        label: '应缴费用',
+                        value: formatFee(record.fee),
+                        secondary: false,
+                    });
+                }
+            } else {
+                items.push({
+                    label: '识别信息',
+                    value: '尚未识别',
+                    secondary: true,
+                });
+            }
+
+            if (!items.some(item => item.label === '应缴费用')) {
+                items.push({
+                    label: '应缴费用',
+                    value: '--',
+                    secondary: true,
+                });
+            }
+
+            resultDiv.innerHTML = items
+                .map(item => `
+                    <div class="result-item">
+                        <span class="result-label">${item.label}：</span>
+                        <span class="result-value${item.secondary ? ' result-secondary' : ''}">${item.value}</span>
+                    </div>
+                `)
+                .join('');
+        }
+
+        /**
+         * 统一重置历史记录表格。
+         */
+        function resetHistoryTable(message = '暂无历史记录') {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">${message}</td></tr>`;
+        }
+
+        /**
+         * 根据上传的 File 渲染预览图。
+         */
+        function renderPreview(cameraType, file) {
+            const preview = document.getElementById(`${cameraType}ImagePreview`);
+            if (!preview) {
+                return;
+            }
+
+            if (!file) {
+                preview.textContent =
+                    cameraType === 'entry' ? '尚未选择进库图片' : '尚未选择出库图片';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="${formatCameraLabel(cameraType)}图片预览">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /**
+         * 处理进/出库图片上传与识别逻辑。
+         */
+        function processUpload(cameraType) {
+            const input = document.getElementById(`${cameraType}ImageInput`);
+            if (!input) {
+                showToast('未找到对应的上传控件', 'error');
+                return;
+            }
+
+            const file = input.files[0];
+            if (!file) {
+                showToast('请选择图片文件', 'error');
+                return;
+            }
+
+            renderPreview(cameraType, file);
+
+            const button = document.getElementById(`${cameraType}UploadButton`);
+            const originalText = button ? button.textContent : '上传并识别';
+            if (button) {
+                button.disabled = true;
+                button.dataset.originalText = originalText;
+                button.textContent = '识别中...';
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('camera_type', cameraType);
+
+            setResultLoading();
+            resetHistoryTable('等待识别结果...');
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response =>
+                    response.json().then(data => ({ ok: response.ok, data }))
+                )
+                .then(({ ok, data }) => {
+                    const status = data.status || (ok ? 'success' : 'error');
+                    if (status === 'success') {
+                        updateResultDisplay(data.result || {}, data.record || null);
+                        showToast('识别成功');
+                        if (data.record && data.record.plate_number) {
+                            searchHistory(data.record.plate_number);
+                        }
+                    } else {
+                        updateResultDisplay(data.result || {}, null);
+                        showToast(data.message || '识别失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error(`processUpload(${cameraType}) error:`, error);
+                    showToast('识别过程中出现错误', 'error');
+                    updateResultDisplay();
+                })
+                .finally(() => {
+                    if (button) {
+                        button.disabled = false;
+                        button.textContent =
+                            button.dataset.originalText || originalText || '上传并识别';
+                    }
+                });
+        }
+
+        /**
+         * 查询并刷新指定车牌的历史记录。
+         */
+        function searchHistory(plateNumber) {
+            let targetPlate = plateNumber;
+            if (!targetPlate) {
+                targetPlate = document.getElementById('plateNumber').value.trim();
+                if (!targetPlate) {
+                    showToast('请输入车牌号码', 'error');
+                    return;
+                }
+            }
+
+            document.getElementById('plateNumber').value = targetPlate;
+            resetHistoryTable('查询中...');
+
+            fetch(`/history/${encodeURIComponent(targetPlate)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (
+                        data.status === 'success' &&
+                        Array.isArray(data.records) &&
+                        data.records.length > 0
+                    ) {
+                        const tbody = document.getElementById('historyTableBody');
+                        tbody.innerHTML = '';
+                        data.records.forEach(record => {
+                            const typeLabel = formatCameraLabel(record.camera_type);
+                            const entryTime =
+                                record.entry_time ||
+                                (record.camera_type === 'entry'
+                                    ? record.recognition_time
+                                    : '-');
+                            const exitTime =
+                                record.exit_time ||
+                                (record.camera_type === 'exit'
+                                    ? record.recognition_time
+                                    : '-');
+                            const feeText =
+                                record.fee !== undefined ? formatFee(record.fee) : '-';
+
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${typeLabel}</td>
+                                <td>${record.plate_number || '-'}</td>
+                                <td>${record.plate_color || '-'}</td>
+                                <td>${entryTime || '-'}</td>
+                                <td>${exitTime || '-'}</td>
+                                <td>${feeText}</td>
+                                <td class="action-cell">
+                                    <button class="btn btn-danger" onclick="deleteRecord('${record.id}', '${record.plate_number || ''}')">删除</button>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    } else {
+                        resetHistoryTable('没有找到相关记录');
+                    }
+                })
+                .catch(error => {
+                    console.error('searchHistory error:', error);
+                    showToast('查询历史记录时出现错误', 'error');
+                    resetHistoryTable('查询失败，请稍后重试');
+                });
+        }
+
+        /**
+         * 删除指定记录，如删除出库记录会自动恢复关联的进库状态。
+         */
+        function deleteRecord(recordId, plateNumber) {
+            if (!recordId) {
+                return;
+            }
+            if (!confirm('确定要删除这条记录吗？')) {
+                return;
+            }
+
+            fetch(`/delete_record/${recordId}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('记录删除成功');
+                        const targetPlate =
+                            plateNumber || document.getElementById('plateNumber').value.trim();
+                        if (targetPlate) {
+                            searchHistory(targetPlate);
+                        } else {
+                            resetHistoryTable();
+                        }
+                    } else {
+                        showToast(data.message || '删除记录失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('deleteRecord error:', error);
+                    showToast('删除记录时出现错误', 'error');
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化结果面板与历史表格。
+            updateResultDisplay();
+            resetHistoryTable();
+            // 图片选择后自动更新预览。
+            ['entry', 'exit'].forEach(type => {
+                const input = document.getElementById(`${type}ImageInput`);
+                if (input) {
+                    input.addEventListener('change', event => {
+                        renderPreview(type, event.target.files[0]);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
