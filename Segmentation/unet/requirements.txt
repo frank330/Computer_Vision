@@ -1,0 +1,8 @@
+Flask==2.2.3
+Flask_Cors==4.0.0
+matplotlib==3.7.2
+numpy==2.3.5
+Pillow==9.5.0
+torch==2.6.0
+torchvision==0.21.0
+
