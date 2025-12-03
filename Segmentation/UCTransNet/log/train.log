@@ -1,0 +1,35 @@
+transformer head num: 4
+transformer layers num: 4
+transformer expand ratio: 4
+transformer expand ratio: 4
+log dir: ./log/tensorboard_logs/
+log dir: ./log/tensorboard_logs/
+
+========= Epoch [1/60] =========
+
+========= Epoch [1/60] =========
+transformer head num: 4
+transformer layers num: 4
+transformer expand ratio: 4
+log dir: ./log/tensorboard_logs/
+
+========= Epoch [1/60] =========
+Training with batch size : 4
+   [Train] Epoch: [1][10/403]  Loss:0.597 (Avg 0.6013) Dice:0.3096 (Avg 0.3323) LR 1.00e-03   (AvgTime 1.6)   
+   [Train] Epoch: [1][20/403]  Loss:0.584 (Avg 0.5786) Dice:0.4286 (Avg 0.3563) LR 1.00e-03   (AvgTime 1.0)   
+   [Train] Epoch: [1][30/403]  Loss:0.544 (Avg 0.5747) Dice:0.4167 (Avg 0.3617) LR 1.00e-03   (AvgTime 0.8)   
+   [Train] Epoch: [1][40/403]  Loss:0.435 (Avg 0.5750) Dice:0.5845 (Avg 0.3505) LR 1.00e-03   (AvgTime 0.8)   
+   [Train] Epoch: [1][50/403]  Loss:0.609 (Avg 0.5668) Dice:0.3368 (Avg 0.3567) LR 1.00e-03   (AvgTime 0.7)   
+   [Train] Epoch: [1][60/403]  Loss:0.586 (Avg 0.5584) Dice:0.3677 (Avg 0.3659) LR 1.00e-03   (AvgTime 0.7)   
+   [Train] Epoch: [1][70/403]  Loss:0.490 (Avg 0.5498) Dice:0.3605 (Avg 0.3767) LR 1.00e-03   (AvgTime 0.7)   
+   [Train] Epoch: [1][80/403]  Loss:0.583 (Avg 0.5477) Dice:0.1765 (Avg 0.3754) LR 1.00e-03   (AvgTime 0.6)   
+   [Train] Epoch: [1][90/403]  Loss:0.589 (Avg 0.5451) Dice:0.2807 (Avg 0.3796) LR 1.00e-03   (AvgTime 0.6)   
+   [Train] Epoch: [1][100/403]  Loss:0.496 (Avg 0.5407) Dice:0.3667 (Avg 0.3838) LR 1.00e-03   (AvgTime 0.6)   
+   [Train] Epoch: [1][110/403]  Loss:0.522 (Avg 0.5382) Dice:0.4137 (Avg 0.3868) LR 1.00e-03   (AvgTime 0.6)   
+   [Train] Epoch: [1][120/403]  Loss:0.585 (Avg 0.5371) Dice:0.3439 (Avg 0.3896) LR 1.00e-03   (AvgTime 0.6)   
+transformer head num: 4
+transformer layers num: 4
+transformer expand ratio: 4
+log dir: ./log/tensorboard_logs/
+
+========= Epoch [1/60] =========
